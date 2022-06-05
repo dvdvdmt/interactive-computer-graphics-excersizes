@@ -8,6 +8,15 @@ var clock = new THREE.Clock()
 function fillScene() {
   scene = new THREE.Scene()
 
+  var light = new THREE.DirectionalLight(0xffffff, 1.0)
+  light.position.set(200, 400, 500)
+
+  var light2 = new THREE.DirectionalLight(0xffffff, 1.0)
+  light2.position.set(-400, 200, -300)
+
+  scene.add(light)
+  scene.add(light2)
+
   // Triangle Mesh
   var material, geometry, mesh
   material = new THREE.MeshBasicMaterial({
@@ -16,9 +25,27 @@ function fillScene() {
   })
   geometry = new THREE.Geometry()
 
-  // Student: add a colored triangle here
+  geometry.vertices.push(
+    new THREE.Vector3(1, 0, 0),
+    new THREE.Vector3(0, 1, 0),
+    new THREE.Vector3(0, 0, 1)
+  )
+
+  geometry.faces.push(new THREE.Face3(0, 1, 2))
+
+  var color1 = new THREE.Color(0xff0000) // orange
+  var color2 = new THREE.Color(0x00ff00) // olive
+  var color3 = new THREE.Color(0x0000ff) // bright blue
+
+  geometry.faces[0].vertexColors = [color1, color2, color3]
 
   mesh = new THREE.Mesh(geometry, material)
+
+  Coordinates.drawAllAxes({
+    axisLength: 5,
+    axisRadius: 0.02,
+    axisTess: 50,
+  })
 
   scene.add(mesh)
 }
@@ -40,7 +67,7 @@ function init() {
 
   // CAMERA
   camera = new THREE.PerspectiveCamera(55, canvasRatio, 1, 4000)
-  camera.position.set(100, 150, 130)
+  camera.position.set(5, 5, 5)
 
   // CONTROLS
   cameraControls = new THREE.OrbitAndPanControls(camera, renderer.domElement)
