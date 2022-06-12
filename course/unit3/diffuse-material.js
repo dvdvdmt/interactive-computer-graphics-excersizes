@@ -44,10 +44,16 @@ function init() {
 
 function createBall() {
   // Do not change the color itself, change the material and use the ambient and diffuse components.
-  var material = new THREE.MeshBasicMaterial({
+  var material = new THREE.MeshLambertMaterial({
     color: 0x80fc66,
     shading: THREE.FlatShading,
   })
+  const colorCoefficient = 0.4
+  material.ambient.setRGB(
+    colorCoefficient * material.color.r,
+    colorCoefficient * material.color.g,
+    colorCoefficient * material.color.b
+  )
   var sphere = new THREE.Mesh(new THREE.SphereGeometry(400, 64, 32), material)
   return sphere
 }
@@ -65,10 +71,14 @@ function fillScene() {
 
   //Coordinates.drawGround({size:1000});
   //Coordinates.drawGrid({size:1000,scale:0.01});
-  //Coordinates.drawAllAxes({axisLength:500,axisRadius:1,axisTess:4});
-}
+  Coordinates.drawAllAxes({
+    axisLength: 500,
+    axisRadius: 1,
+    axisTess: 4
+  })
+,}
 
-function addToDOM() {
+fu;nction addToDOM() {
   var container = document.getElementById('container')
   var canvas = container.getElementsByTagName('canvas')
   if (canvas.length > 0) {
