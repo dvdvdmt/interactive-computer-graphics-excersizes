@@ -46,7 +46,6 @@ function createBall() {
   // Do not change the color itself, change the material and use the ambient and diffuse components.
   var material = new THREE.MeshLambertMaterial({
     color: 0x80fc66,
-    shading: THREE.FlatShading,
   })
   const colorCoefficient = 0.4
   material.ambient.setRGB(
@@ -74,11 +73,11 @@ function fillScene() {
   Coordinates.drawAllAxes({
     axisLength: 500,
     axisRadius: 1,
-    axisTess: 4
+    axisTess: 4,
   })
-,}
+}
 
-fu;nction addToDOM() {
+function addToDOM() {
   var container = document.getElementById('container')
   var canvas = container.getElementsByTagName('canvas')
   if (canvas.length > 0) {
