@@ -1,39 +1,193 @@
-'use strict' // good practice - see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Strict_mode
 ////////////////////////////////////////////////////////////////////////////////
-// Drinking Bird Model exercise                                               //
-// Your task is to complete the model for the drinking bird                   //
-// Please work from the formal blueprint dimensions and positions shown at    //
-// https://www.udacity.com/wiki/cs291/notes                                   //
-//                                                                            //
-// The following materials should be used:                                    //
-// Hat and spine: cylinderMaterial (blue)                                     //
-// Head and bottom body: sphereMaterial (red)                                 //
-// Rest of body: cubeMaterial (orange)                                        //
-//                                                                            //
-// So that the exercise passes, and the spheres and cylinders look good,      //
-// all SphereGeometry calls should be of the form:                            //
-//     SphereGeometry( radius, 32, 16 );                                      //
-// and CylinderGeometry calls should be of the form:                          //
-//     CylinderGeometry( radiusTop, radiusBottom, height, 32 );               //
-////////////////////////////////////////////////////////////////////////////////
-/*global THREE, Coordinates, $, document, window, dat*/
+/*global THREE, Coordinates, document, window  */
+var camera,
+  scene,
+  renderer;
+var cameraControls;
 
-var camera, scene, renderer
-var cameraControls, effectController
-var clock = new THREE.Clock()
-var gridX = false
-var gridY = false
-var gridZ = false
-var axes = true
-var ground = true
-var wireframe = false
+var clock = new THREE.Clock();
+
+function fillScene() {
+  scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x808080, 2000, 4000);
+
+  // LIGHTS
+
+  scene.add(new THREE.AmbientLight(0x222222));
+
+  var light = new THREE.DirectionalLight(0xffffff, 0.7);
+  light.position.set(200, 500, 500);
+
+  scene.add(light);
+
+  light = new THREE.DirectionalLight(0xffffff, 0.9);
+  light.position.set(-200, -100, -400);
+
+  scene.add(light);
+
+  Coordinates.drawGround({size: 1000});
+
+  drawDrinkingBird();
+}
+
+function drawDrinkingBird() {
+  //////////////////////////////
+  // MATERIALS
+  var headMaterial = new THREE.MeshLambertMaterial();
+  headMaterial.color.r = 104 / 255;
+  headMaterial.color.g = 1 / 255;
+  headMaterial.color.b = 5 / 255;
+
+  var hatMaterial = new THREE.MeshPhongMaterial({shininess: 100});
+  hatMaterial.color.r = 24 / 255;
+  hatMaterial.color.g = 38 / 255;
+  hatMaterial.color.b = 77 / 255;
+  hatMaterial.specular.setRGB(0.5, 0.5, 0.5);
+
+  var bodyMaterial = new THREE.MeshPhongMaterial({shininess: 100});
+  bodyMaterial.color.setRGB(31 / 255, 86 / 255, 169 / 255);
+  bodyMaterial.specular.setRGB(0.5, 0.5, 0.5);
+
+  // MODIFY THIS TO BE TRANSPARENT:
+  var glassMaterial = new THREE.MeshPhongMaterial({
+    color: 0x000000,
+    shininess: 100,
+    opacity: 0.3,
+    transparent: true,
+    specular: 0xffffff,
+  });
+
+  var legMaterial = new THREE.MeshPhongMaterial({shininess: 4});
+  legMaterial.color.setHex(0xada79b);
+  legMaterial.specular.setRGB(0.5, 0.5, 0.5);
+
+  var footMaterial = new THREE.MeshPhongMaterial({
+    color: 0x960f0b,
+    shininess: 30,
+  });
+  footMaterial.specular.setRGB(0.5, 0.5, 0.5);
+
+  var sphere,
+    cylinder,
+    cube;
+
+  var bevelRadius = 1.9; // TODO: 2.0 causes some geometry bug.
+
+  // MODELS
+  // base
+  cube = new THREE.Mesh(
+    new THREE.BeveledBlockGeometry(20 + 64 + 110, 4, 2 * 77 + 12, bevelRadius),
+    footMaterial,
+  );
+  cube.position.x = -45; // (20+32) - half of width (20+64+110)/2
+  cube.position.y = 4 / 2; // half of height
+  cube.position.z = 0; // centered at origin
+  scene.add(cube);
+
+  // feet
+  cube = new THREE.Mesh(
+    new THREE.BeveledBlockGeometry(20 + 64 + 110, 52, 6, bevelRadius),
+    footMaterial,
+  );
+  cube.position.x = -45; // (20+32) - half of width (20+64+110)/2
+  cube.position.y = 52 / 2; // half of height
+  cube.position.z = 77 + 6 / 2; // offset 77 + half of depth 6/2
+  scene.add(cube);
+
+  cube = new THREE.Mesh(
+    new THREE.BeveledBlockGeometry(20 + 64 + 110, 52, 6, bevelRadius),
+    footMaterial,
+  );
+  cube.position.x = -45; // (20+32) - half of width (20+64+110)/2
+  cube.position.y = 52 / 2; // half of height
+  cube.position.z = -(77 + 6 / 2); // negative offset 77 + half of depth 6/2
+  scene.add(cube);
+
+  cube = new THREE.Mesh(new THREE.BeveledBlockGeometry(64, 104, 6, bevelRadius), footMaterial);
+  cube.position.x = 0; // centered on origin along X
+  cube.position.y = 104 / 2;
+  cube.position.z = 77 + 6 / 2; // negative offset 77 + half of depth 6/2
+  scene.add(cube);
+
+  cube = new THREE.Mesh(new THREE.BeveledBlockGeometry(64, 104, 6, bevelRadius), footMaterial);
+  cube.position.x = 0; // centered on origin along X
+  cube.position.y = 104 / 2;
+  cube.position.z = -(77 + 6 / 2); // negative offset 77 + half of depth 6/2
+  scene.add(cube);
+
+  // legs
+  cube = new THREE.Mesh(new THREE.BeveledBlockGeometry(60, 282 + 4, 4, bevelRadius), legMaterial);
+  cube.position.x = 0; // centered on origin along X
+  cube.position.y = 104 + 282 / 2 - 2;
+  cube.position.z = 77 + 6 / 2; // negative offset 77 + half of depth 6/2
+  scene.add(cube);
+
+  cube = new THREE.Mesh(new THREE.BeveledBlockGeometry(60, 282 + 4, 4, bevelRadius), legMaterial);
+  cube.position.x = 0; // centered on origin along X
+  cube.position.y = 104 + 282 / 2 - 2;
+  cube.position.z = -(77 + 6 / 2); // negative offset 77 + half of depth 6/2
+  scene.add(cube);
+
+  // body
+  sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(104 / 2, 32, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI),
+    bodyMaterial,
+  );
+  sphere.position.x = 0;
+  sphere.position.y = 160;
+  sphere.position.z = 0;
+  scene.add(sphere);
+
+  // cap for top of hemisphere
+  cylinder = new THREE.Mesh(new THREE.CylinderGeometry(104 / 2, 104 / 2, 0, 32), bodyMaterial);
+  cylinder.position.x = 0;
+  cylinder.position.y = 160;
+  cylinder.position.z = 0;
+  scene.add(cylinder);
+
+  cylinder = new THREE.Mesh(new THREE.CylinderGeometry(12 / 2, 12 / 2, 390 - 100, 32), bodyMaterial);
+  cylinder.position.x = 0;
+  cylinder.position.y = 160 + 390 / 2 - 100;
+  cylinder.position.z = 0;
+  scene.add(cylinder);
+
+  // glass stem
+  sphere = new THREE.Mesh(new THREE.SphereGeometry(116 / 2, 32, 16), glassMaterial);
+  sphere.position.x = 0;
+  sphere.position.y = 160;
+  sphere.position.z = 0;
+  scene.add(sphere);
+
+  cylinder = new THREE.Mesh(new THREE.CylinderGeometry(24 / 2, 24 / 2, 390, 32), glassMaterial);
+  cylinder.position.x = 0;
+  cylinder.position.y = 160 + 390 / 2;
+  cylinder.position.z = 0;
+  scene.add(cylinder);
+
+  // head
+  sphere = new THREE.Mesh(new THREE.SphereGeometry(104 / 2, 32, 16), headMaterial);
+  sphere.position.x = 0;
+  sphere.position.y = 160 + 390;
+  sphere.position.z = 0;
+  scene.add(sphere);
+
+  // hat
+  cylinder = new THREE.Mesh(new THREE.CylinderGeometry(142 / 2, 142 / 2, 10, 32), hatMaterial);
+  cylinder.position.x = 0;
+  cylinder.position.y = 160 + 390 + 40 + 10 / 2;
+  cylinder.position.z = 0;
+  scene.add(cylinder);
+
+  cylinder = new THREE.Mesh(new THREE.CylinderGeometry(80 / 2, 80 / 2, 70, 32), hatMaterial);
+  cylinder.position.x = 0;
+  cylinder.position.y = 160 + 390 + 40 + 10 + 70 / 2;
+  cylinder.position.z = 0;
+  scene.add(cylinder);
+}
 
 function init() {
   var canvasWidth = 846
   var canvasHeight = 494
-  // For grading the window is fixed in size; here's general code:
-  //var canvasWidth = window.innerWidth;
-  //var canvasHeight = window.innerHeight;
   var canvasRatio = canvasWidth / canvasHeight
 
   // RENDERER
@@ -44,189 +198,13 @@ function init() {
   renderer.setClearColorHex(0xaaaaaa, 1.0)
 
   // CAMERA
-  camera = new THREE.PerspectiveCamera(45, canvasRatio, 1, 40000)
+  camera = new THREE.PerspectiveCamera(45, canvasRatio, 1, 4000)
   // CONTROLS
   cameraControls = new THREE.OrbitAndPanControls(camera, renderer.domElement)
-
-  camera.position.set(-480, 659, -619)
+  camera.position.set(-417, 367, -234)
   cameraControls.target.set(4, 301, 92)
-
-  fillScene()
 }
 
-// Supporting frame for the bird - base + legs + feet
-function createSupport() {
-  var cubeMaterial = new THREE.MeshLambertMaterial({
-    color: 0xf07020,
-    wireframe,
-  })
-  // base
-  var cube
-  cube = new THREE.Mesh(new THREE.CubeGeometry(20 + 64 + 110, 4, 2 * 77), cubeMaterial)
-  cube.position.x = -45 // (20+32) - half of width (20+64+110)/2
-  cube.position.y = 4 / 2 // half of height
-  cube.position.z = 0 // centered at origin
-  scene.add(cube)
-
-  // right foot
-  cube = new THREE.Mesh(new THREE.CubeGeometry(20 + 64 + 110, 52, 6), cubeMaterial)
-  cube.position.x = -45 // (20+32) - half of width (20+64+110)/2
-  cube.position.y = 52 / 2 // half of height
-  cube.position.z = 77 + 6 / 2 // offset 77 + half of depth 6/2
-  scene.add(cube)
-
-  // right leg
-  cube = new THREE.Mesh(new THREE.CubeGeometry(64, 334 + 52, 6), cubeMaterial)
-  cube.position.x = 0 // centered on origin along X
-  cube.position.y = (334 + 52) / 2
-  cube.position.z = 77 + 6 / 2 // offset 77 + half of depth 6/2
-  scene.add(cube)
-
-  // left foot
-  cube = new THREE.Mesh(new THREE.CubeGeometry(20 + 64 + 110, 52, 6), cubeMaterial)
-  cube.position.x = -45 // (20+32) - half of width (20+64+110)/2
-  cube.position.y = 52 / 2 // half of height
-  cube.position.z = -(77 + 6 / 2) // offset 77 + half of depth 6/2
-  scene.add(cube)
-
-  // left leg
-  cube = new THREE.Mesh(new THREE.CubeGeometry(64, 334 + 52, 6), cubeMaterial)
-  cube.position.x = 0 // centered on origin along X
-  cube.position.y = (334 + 52) / 2
-  cube.position.z = -(77 + 6 / 2) // offset 77 + half of depth 6/2
-  scene.add(cube)
-}
-
-// Body of the bird - body and the connector of body and head
-function createBody() {
-  var sphereMaterial = new THREE.MeshLambertMaterial({
-    color: 0xa00000,
-    wireframe,
-  })
-  var cylinderMaterial = new THREE.MeshLambertMaterial({
-    color: 0x0000d0,
-    wireframe,
-  })
-
-  const bottomSphere = new THREE.Mesh(new THREE.SphereGeometry(58, 32, 16), sphereMaterial)
-  bottomSphere.position.x = 0
-  const spherePositionY = 160
-  bottomSphere.position.y = spherePositionY
-  bottomSphere.position.z = 0 // offset 77 + half of depth 6/2
-  scene.add(bottomSphere)
-
-  const cylinderHeight = 390
-  const bodyCylinder = new THREE.Mesh(
-    new THREE.CylinderGeometry(24, 24, cylinderHeight, 32),
-    cylinderMaterial
-  )
-  bodyCylinder.position.x = 0
-  bodyCylinder.position.y = spherePositionY + cylinderHeight / 2
-  bodyCylinder.position.z = 0 // offset 77 + half of depth 6/2
-  scene.add(bodyCylinder)
-}
-
-// Head of the bird - head + hat
-function createHead() {
-  var sphereMaterial = new THREE.MeshLambertMaterial({
-    color: 0xa00000,
-    wireframe,
-  })
-  var cylinderMaterial = new THREE.MeshLambertMaterial({
-    color: 0x0000d0,
-    wireframe,
-  })
-
-  const headSphere = new THREE.Mesh(new THREE.SphereGeometry(52, 32, 16), sphereMaterial)
-  headSphere.position.x = 0
-  const headSpherePositionY = 550
-  headSphere.position.y = headSpherePositionY
-  headSphere.position.z = 0
-  scene.add(headSphere)
-
-  const cylinderBaseHeight = 10
-  const hatBaseCylinder = new THREE.Mesh(
-    new THREE.CylinderGeometry(71, 71, cylinderBaseHeight, 32),
-    cylinderMaterial
-  )
-  hatBaseCylinder.position.x = 0
-  hatBaseCylinder.position.y = headSpherePositionY + 40 + cylinderBaseHeight / 2
-  hatBaseCylinder.position.z = 0
-  scene.add(hatBaseCylinder)
-
-  const hatTopHeight = 70
-  const hatTopCylinder = new THREE.Mesh(
-    new THREE.CylinderGeometry(40, 40, hatTopHeight, 32),
-    cylinderMaterial
-  )
-  hatTopCylinder.position.x = 0
-  hatTopCylinder.position.y = hatBaseCylinder.position.y + cylinderBaseHeight / 2 + hatTopHeight / 2
-  hatTopCylinder.position.z = 0
-  scene.add(hatTopCylinder)
-}
-
-function createDrinkingBird() {
-  // MODELS
-  // base + legs + feet
-  createSupport()
-
-  // body + body/head connector
-  createBody()
-
-  // head + hat
-  createHead()
-}
-
-function fillScene() {
-  // SCENE
-  scene = new THREE.Scene()
-  scene.fog = new THREE.Fog(0x808080, 3000, 6000)
-  // LIGHTS
-  var ambientLight = new THREE.AmbientLight(0x222222)
-  var light = new THREE.DirectionalLight(0xffffff, 1.0)
-  light.position.set(200, 400, 500)
-
-  var light2 = new THREE.DirectionalLight(0xffffff, 1.0)
-  light2.position.set(-400, 200, -300)
-
-  scene.add(ambientLight)
-  scene.add(light)
-  scene.add(light2)
-
-  if (ground) {
-    Coordinates.drawGround({size: 1000})
-  }
-  if (gridX) {
-    Coordinates.drawGrid({
-      size: 1000,
-      scale: 0.01,
-    })
-  }
-  if (gridY) {
-    Coordinates.drawGrid({
-      size: 1000,
-      scale: 0.01,
-      orientation: 'y',
-    })
-  }
-  if (gridZ) {
-    Coordinates.drawGrid({
-      size: 1000,
-      scale: 0.01,
-      orientation: 'z',
-    })
-  }
-  if (axes) {
-    Coordinates.drawAllAxes({
-      axisLength: 300,
-      axisRadius: 2,
-      axisTess: 50,
-    })
-  }
-  createDrinkingBird()
-}
-
-//
 function addToDOM() {
   var container = document.getElementById('container')
   var canvas = container.getElementsByTagName('canvas')
@@ -244,50 +222,18 @@ function animate() {
 function render() {
   var delta = clock.getDelta()
   cameraControls.update(delta)
-  if (
-    effectController.newGridX !== gridX ||
-    effectController.newGridY !== gridY ||
-    effectController.newGridZ !== gridZ ||
-    effectController.newGround !== ground ||
-    effectController.newAxes !== axes ||
-    effectController.newWireframe !== wireframe
-  ) {
-    gridX = effectController.newGridX
-    gridY = effectController.newGridY
-    gridZ = effectController.newGridZ
-    ground = effectController.newGround
-    axes = effectController.newAxes
-    wireframe = effectController.newWireframe
 
-    fillScene()
-  }
   renderer.render(scene, camera)
-}
-
-function setupGui() {
-  effectController = {
-    newGridX: gridX,
-    newGridY: gridY,
-    newGridZ: gridZ,
-    newGround: ground,
-    newAxes: axes,
-    newWireframe: wireframe,
-  }
-
-  var gui = new dat.GUI()
-  gui.add(effectController, 'newGridX').name('Show XZ grid')
-  gui.add(effectController, 'newGridY').name('Show YZ grid')
-  gui.add(effectController, 'newGridZ').name('Show XY grid')
-  gui.add(effectController, 'newGround').name('Show ground')
-  gui.add(effectController, 'newAxes').name('Show axes')
-  gui.add(effectController, 'newWireframe').name('Wireframe')
 }
 
 try {
   init()
-  setupGui()
-  addToDOM()
-  animate()
+  fillSc
+  ene()
+  addToD
+  OM()
+  animat
+  e()
 } catch (e) {
   var errorReport =
     'Your program encountered an unrecoverable error, can not draw on canvas. Error was:<br/><br/>'
