@@ -65,6 +65,7 @@ function fillScene() {
   // CODE FOR THE CLOCK HAND
   cube = new THREE.Mesh(new THREE.CubeGeometry(110, 4, 4), handMaterial)
   cube.position.y = 14
+  cube.rotation.y = (-60 * Math.PI) / 180
 
   // YOUR CODE HERE
 
