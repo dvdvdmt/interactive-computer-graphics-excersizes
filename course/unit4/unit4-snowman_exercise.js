@@ -50,9 +50,8 @@ function fillScene() {
   // YOUR CHANGES HERE
   // These positions are given just so you can see the stick.
   // You will need to reposition, etc.
-  cylinder.position.x = -20
-  cylinder.position.y = 30
-  cylinder.position.z = -55
+  cylinder.rotation.x = (90 * Math.PI) / 180
+  cylinder.position.y = 50
 
   scene.add(cylinder)
 }
@@ -81,7 +80,7 @@ function init() {
   // CONTROLS
   cameraControls = new THREE.OrbitAndPanControls(camera, renderer.domElement)
   //cameraControls.target.set(0,50,0);
-  camera.position.set(-120, 66, 23)
+  camera.position.set(-120, 120, 120)
   cameraControls.target.set(0, 43, -8)
 }
 
