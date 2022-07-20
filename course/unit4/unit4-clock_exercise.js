@@ -65,22 +65,26 @@ function fillScene() {
 
   // YOUR CODE HERE:
   // The dimensions and rotation angles of the hands are correct
-  // you just have find a way to perform them in the correct order
+  // you just have to find a way to perform them in the correct order
   cube = new THREE.Mesh(new THREE.CubeGeometry(70, 4, 4), minuteHandMaterial)
   cube.position.y = 14
   cube.position.x = 70 / 2 - 10
-  cube.rotation.y = (-60 * Math.PI) / 180
-  scene.add(cube)
+  const minuteHand = new THREE.Object3D()
+  minuteHand.add(cube)
+  minuteHand.rotation.y = (-60 * Math.PI) / 180
+  scene.add(minuteHand)
 
   var sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 16), hourHandMaterial)
   sphere.position.y = 18 // move the hand above the other hand
   sphere.position.x = 50 / 2 - 10
-  sphere.rotation.y = (30 * Math.PI) / 180
   sphere.scale.x = 50
   sphere.scale.y = 4
   sphere.scale.z = 4
+  const hourHand = new THREE.Object3D()
+  hourHand.rotation.y = (30 * Math.PI) / 180
+  hourHand.add(sphere)
 
-  scene.add(sphere)
+  scene.add(hourHand)
 }
 
 function init() {
