@@ -13,6 +13,27 @@ var gridZ = false
 var axes = true
 var ground = true
 
+function createPetals() {
+  const petalMaterial = new THREE.MeshLambertMaterial({color: 0xcc5920})
+  const petalLength = 120
+  const reverse = 1
+  const result = new THREE.Object3D()
+  const cylGeom = new THREE.CylinderGeometry(15, 0, petalLength, 32)
+  const cylinder = new THREE.Mesh(cylGeom, petalMaterial)
+  cylinder.scale.x = 0.25
+  cylinder.position.y = (reverse * petalLength) / 2
+  const petalsNumber = 24
+  for (let i = 0; i < petalsNumber; i++) {
+    const petal = cylinder.clone()
+    const petalBox = new THREE.Object3D()
+    petalBox.add(petal)
+    petalBox.rotation.z = ((90 - 20 * reverse) * Math.PI) / 180
+    petalBox.rotation.y = (360 / petalsNumber) * i * (Math.PI / 180)
+    result.add(petalBox)
+  }
+  return result
+}
+
 function fillScene() {
   scene = new THREE.Scene()
   scene.fog = new THREE.Fog(0x808080, 2000, 4000)
@@ -31,10 +52,8 @@ function fillScene() {
   scene.add(light2)
 
   // FLOWER
-  var petalMaterial = new THREE.MeshLambertMaterial({color: 0xcc5920})
+
   var flowerHeight = 200
-  var petalLength = 120
-  var cylGeom = new THREE.CylinderGeometry(15, 0, petalLength, 32)
   var flower = new THREE.Object3D()
 
   /////////
@@ -43,12 +62,13 @@ function fillScene() {
   // Scales, rotates, and positions on the cylinder and petals are needed.
   // The petals should be squished and be 1/4 as thick as wide
   // and they should be tilted 20 degrees up from the position in the previous exercise
-
-  var cylinder = new THREE.Mesh(cylGeom, petalMaterial)
-  var petal = new THREE.Object3D()
-  petal.add(cylinder)
-
-  flower.add(petal)
+  const petals = createPetals()
+  // console.log(`[fillScene petals.properties]`, petals)
+  // const box = new THREE.Box3().setFromObject(petals)
+  // console.log(`[fillScene box]`, box)
+  // petals.position.y = flowerHeight + (Math.sin(20 * (Math.PI / 180)) * 120) / 2
+  petals.position.y = flowerHeight
+  flower.add(petals)
 
   // Rest of the flower
   var stamenMaterial = new THREE.MeshLambertMaterial({color: 0x333310})
