@@ -13,6 +13,25 @@ var gridZ = false
 var axes = true
 var ground = true
 
+function createPetals() {
+  const petalMaterial = new THREE.MeshLambertMaterial({color: 0xcc5920})
+  const petalLength = 120
+  const result = new THREE.Object3D()
+  const cylGeom = new THREE.CylinderGeometry(15, 0, petalLength, 32)
+  const cylinder = new THREE.Mesh(cylGeom, petalMaterial)
+  const petalsNumber = 24
+  for (let i = 0; i < petalsNumber; i++) {
+    const petal = cylinder.clone()
+    petal.position.z = petalLength / 2
+    petal.rotation.x = (90 * Math.PI) / 180
+    const petalBox = new THREE.Object3D()
+    petalBox.add(petal)
+    petalBox.rotation.y = (360 / petalsNumber) * i * (Math.PI / 180)
+    result.add(petalBox)
+  }
+  return result
+}
+
 function fillScene() {
   scene = new THREE.Scene()
   scene.fog = new THREE.Fog(0x808080, 2000, 4000)
@@ -31,21 +50,18 @@ function fillScene() {
   scene.add(light2)
 
   // FLOWER
-  var petalMaterial = new THREE.MeshLambertMaterial({color: 0xcc5920})
+
   var flowerHeight = 200
-  var petalLength = 120
-  var cylGeom = new THREE.CylinderGeometry(15, 0, petalLength, 32)
   var flower = new THREE.Object3D()
 
   /////////
   // YOUR CODE HERE
   // add code here to make 24 petals, radiating around the sphere
   // Just rotates and positions on the cylinder and petals are needed.
-  var cylinder = new THREE.Mesh(cylGeom, petalMaterial)
-  var petal = new THREE.Object3D()
-  petal.add(cylinder)
+  const petals = createPetals()
+  petals.position.y = flowerHeight
 
-  flower.add(petal)
+  flower.add(petals)
 
   // Rest of the flower
   var stamenMaterial = new THREE.MeshLambertMaterial({color: 0x333310})
