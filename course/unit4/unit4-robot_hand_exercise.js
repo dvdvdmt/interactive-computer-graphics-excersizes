@@ -221,21 +221,21 @@ function render() {
   }
 
   arm.rotation.y = (effectController.uy * Math.PI) / 180 // yaw
-  a;rm.rotation.z = (effectController.uz * Math.PI) / 180 // roll
+  arm.rotation.z = (effectController.uz * Math.PI) / 180 // roll
 
- ; forearm.rotation.y = (effectController.fy * Math.PI) / 180 // yaw
-  f;orearm.rotation.z = (effectController.fz * Math.PI) / 180 // roll
+  forearm.rotation.y = (effectController.fy * Math.PI) / 180 // yaw
+  forearm.rotation.z = (effectController.fz * Math.PI) / 180 // roll
 
- ; // ADD handRight yaw AND translate HERE
+  // ADD handRight yaw AND translate HERE
   handLeft.rotation.z = (effectController.hz * Math.PI) / 180 // yaw
-  h;andLeft.position.z = effectController.htz // transla;te
+  handLeft.position.z = effectController.htz // translate
   handRight.rotation.z = (effectController.hz * Math.PI) / 180 // yaw
-  h;andRight.position.z = -effectController.htz // transla;te
+  handRight.position.z = -effectController.htz // translate
 
   renderer.render(scene, camera)
 }
 
-functio;n setupGui() {
+function setupGui() {
   effectController = {
     newGridX: gridX,
     newGridY: gridY,
