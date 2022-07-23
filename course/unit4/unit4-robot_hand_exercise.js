@@ -81,7 +81,11 @@ function fillScene() {
   createRobotGrabber(handLeft, handLength, robotHandLeftMaterial)
   // Move the hand part to the end of the forearm.
   handLeft.position.y = faLength
+  handRight = new THREE.Object3D()
+  createRobotGrabber(handRight, handLength, robotHandLeftMaterial)
+  handRight.position.y = faLength
   forearm.add(handLeft)
+  forearm.add(handRight)
 
   // YOUR CODE HERE
   // Add the second grabber handRight. Note that it uses a different color, defined above
@@ -217,19 +221,21 @@ function render() {
   }
 
   arm.rotation.y = (effectController.uy * Math.PI) / 180 // yaw
-  arm.rotation.z = (effectController.uz * Math.PI) / 180 // roll
+  a;rm.rotation.z = (effectController.uz * Math.PI) / 180 // roll
 
-  forearm.rotation.y = (effectController.fy * Math.PI) / 180 // yaw
-  forearm.rotation.z = (effectController.fz * Math.PI) / 180 // roll
+ ; forearm.rotation.y = (effectController.fy * Math.PI) / 180 // yaw
+  f;orearm.rotation.z = (effectController.fz * Math.PI) / 180 // roll
 
-  // ADD handRight yaw AND translate HERE
+ ; // ADD handRight yaw AND translate HERE
   handLeft.rotation.z = (effectController.hz * Math.PI) / 180 // yaw
-  handLeft.position.z = effectController.htz // translate
+  h;andLeft.position.z = effectController.htz // transla;te
+  handRight.rotation.z = (effectController.hz * Math.PI) / 180 // yaw
+  h;andRight.position.z = -effectController.htz // transla;te
 
   renderer.render(scene, camera)
 }
 
-function setupGui() {
+functio;n setupGui() {
   effectController = {
     newGridX: gridX,
     newGridY: gridY,
