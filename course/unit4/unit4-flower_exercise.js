@@ -19,11 +19,11 @@ function createPetals() {
   const result = new THREE.Object3D()
   const cylGeom = new THREE.CylinderGeometry(15, 0, petalLength, 32)
   const cylinder = new THREE.Mesh(cylGeom, petalMaterial)
+  cylinder.position.z = petalLength / 2
+  cylinder.rotation.x = (90 * Math.PI) / 180
   const petalsNumber = 24
   for (let i = 0; i < petalsNumber; i++) {
     const petal = cylinder.clone()
-    petal.position.z = petalLength / 2
-    petal.rotation.x = (90 * Math.PI) / 180
     const petalBox = new THREE.Object3D()
     petalBox.add(petal)
     petalBox.rotation.y = (360 / petalsNumber) * i * (Math.PI / 180)
