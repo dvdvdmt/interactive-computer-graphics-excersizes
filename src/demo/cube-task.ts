@@ -56,10 +56,3 @@ function getSquareMesh() {
   const material = new THREE.MeshBasicMaterial({color: 0x0000ff})
   return new THREE.Mesh(geometry, material)
 }
-
-function getBoxMesh() {
-  const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2)
-  const material = new THREE.MeshNormalMaterial()
-
-  return new THREE.Mesh(geometry, material)
-}

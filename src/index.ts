@@ -1,13 +1,8 @@
-interface IDemo {
-  start(): void
-  stop(): void
-}
-
 const demoRegistry = [
   {
     name: 'cube-task',
     import() {
-      import('./cube-task')
+      import('./demo/cube-task')
     },
   },
 ]
@@ -30,7 +25,7 @@ function getPathName() {
   return match ? match[1] : ''
 }
 
-async function showDemo(pathName: string) {
+function showDemo(pathName: string) {
   const demo = demoRegistry.find((demo) => demo.name === pathName)
   if (demo) {
     demo.import()
