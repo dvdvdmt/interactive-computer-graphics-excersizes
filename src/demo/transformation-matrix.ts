@@ -7,20 +7,27 @@ The demo is about transformations and how we can use matrices to combine them.
 
 document.title = 'Transformations'
 
-const params = initParams()
-
 const camera = getOrthographicCamera()
 const mesh = getBox()
 const axesHelper = new THREE.AxesHelper(5)
 const scene = new THREE.Scene()
 scene.add(axesHelper)
 scene.add(mesh)
+scene.add(getContour(mesh.geometry))
 
 const renderer = new THREE.WebGLRenderer({antialias: true})
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.render(scene, camera)
 renderer.setAnimationLoop(animation)
 document.body.appendChild(renderer.domElement)
+const params = initParams()
+
+
+function getContour(geometry: THREE.BufferGeometry) {
+  const edges = new THREE.EdgesGeometry(geometry)
+  const material = new THREE.LineBasicMaterial({color: 0xffffff})
+  return new THREE.LineSegments(edges, material)
+}
 
 function animation(time: number) {
   mesh.position.x = params.position.x
