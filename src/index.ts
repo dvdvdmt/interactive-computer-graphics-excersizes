@@ -5,6 +5,12 @@ const demoRegistry = [
       import('./demo/cube-task')
     },
   },
+  {
+    name: 'transformation-matrix',
+    import() {
+      import('./demo/transformation-matrix')
+    },
+  },
 ]
 
 function createDemoList() {
