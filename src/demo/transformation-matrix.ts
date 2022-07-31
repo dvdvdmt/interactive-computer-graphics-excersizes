@@ -22,7 +22,6 @@ renderer.setAnimationLoop(animation)
 document.body.appendChild(renderer.domElement)
 const params = initParams()
 
-
 function getContour(geometry: THREE.BufferGeometry) {
   const edges = new THREE.EdgesGeometry(geometry)
   const material = new THREE.LineBasicMaterial({color: 0xffffff})
@@ -32,6 +31,9 @@ function getContour(geometry: THREE.BufferGeometry) {
 function animation(time: number) {
   mesh.position.x = params.position.x
   mesh.position.y = params.position.y
+  mesh.rotation.z = params.rotation * (Math.PI / 180)
+  mesh.scale.x = params.scale
+  mesh.scale.y = params.scale
 
   renderer.render(scene, camera)
 }
@@ -66,11 +68,19 @@ function getOrthographicCamera() {
 }
 
 function initParams() {
-  const params = {position: {x: 0, y: 0}}
+  const params = {position: {x: 0, y: 0}, rotation: 0, scale: 1}
   const pane = new Pane()
   pane.addInput(params, 'position', {
-    x: {min: -100, max: 100},
-    y: {min: -100, max: 100, inverted: true},
+    x: {min: camera.left, max: camera.right},
+    y: {min: camera.bottom, max: camera.top, inverted: true},
+  })
+  pane.addInput(params, 'rotation', {
+    min: -180,
+    max: 180,
+  })
+  pane.addInput(params, 'scale', {
+    min: 0.1,
+    max: 4,
   })
   return params
 }
