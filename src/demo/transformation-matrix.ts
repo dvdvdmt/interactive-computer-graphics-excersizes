@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import {Pane} from 'tweakpane'
+import {Matrix4} from 'three'
 
 /*
 The demo is about transformations and how we can use matrices to combine them.
@@ -28,12 +29,32 @@ function getContour(geometry: THREE.BufferGeometry) {
   return new THREE.LineSegments(edges, material)
 }
 
+function getTransformationMatrix() {
+  const result = new Matrix4()
+  const tx = params.position.x
+  const ty = params.position.y
+  // prettier-ignore
+  result.set(
+    1, 0, 0, tx,
+    0, 1, 0, ty,
+    0, 0, 1, 0,
+    0, 0, 0, 1,
+  )
+  return result
+}
+
 function animation(time: number) {
-  mesh.position.x = params.position.x
-  mesh.position.y = params.position.y
-  mesh.rotation.z = params.rotation * (Math.PI / 180)
-  mesh.scale.x = params.scale
-  mesh.scale.y = params.scale
+  if (params.useMatrix) {
+    mesh.matrixAutoUpdate = false
+    mesh.matrix = getTransformationMatrix()
+  } else {
+    mesh.matrixAutoUpdate = true
+    mesh.position.x = params.position.x
+    mesh.position.y = params.position.y
+    mesh.rotation.z = params.rotation * (Math.PI / 180)
+    mesh.scale.x = params.scale
+    mesh.scale.y = params.scale
+  }
 
   renderer.render(scene, camera)
 }
@@ -68,8 +89,9 @@ function getOrthographicCamera() {
 }
 
 function initParams() {
-  const params = {position: {x: 0, y: 0}, rotation: 0, scale: 1}
+  const params = {useMatrix: false, position: {x: 0, y: 0}, rotation: 0, scale: 1}
   const pane = new Pane()
+  pane.addInput(params, 'useMatrix')
   pane.addInput(params, 'position', {
     x: {min: camera.left, max: camera.right},
     y: {min: camera.bottom, max: camera.top, inverted: true},
