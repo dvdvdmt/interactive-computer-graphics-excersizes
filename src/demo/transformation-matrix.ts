@@ -31,12 +31,18 @@ function getContour(geometry: THREE.BufferGeometry) {
 
 function getTransformationMatrix() {
   const result = new Matrix4()
+  // Translation in XY coordinate plane
   const tx = params.position.x
   const ty = params.position.y
+  // Rotation around Z axis. The plane XY is rotated around Z axis counterclockwise,
+  // as a consequence all the points in it get the new coordinates,
+  // which looks like they are rotated in clockwise direction.
+  const {PI, cos, sin} = Math
+  const theta = params.rotation * (PI / 2)
   // prettier-ignore
   result.set(
-    1, 0, 0, tx,
-    0, 1, 0, ty,
+    cos(theta), -sin(theta), 0, tx,
+    sin(theta), cos(theta), 0, ty,
     0, 0, 1, 0,
     0, 0, 0, 1,
   )
