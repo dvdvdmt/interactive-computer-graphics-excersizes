@@ -8,6 +8,7 @@ The demo is about transformations and how we can use matrices to combine them.
 
 document.title = 'Transformations'
 
+let isRenderingNeeded = true
 const camera = getOrthographicCamera()
 const mesh = getBox()
 const axesHelper = new THREE.AxesHelper(5)
@@ -39,17 +40,22 @@ function getTransformationMatrix() {
   // which looks like they are rotated in clockwise direction.
   const {PI, cos, sin} = Math
   const theta = params.rotation * (PI / 2)
+  const scale = params.scale
   // prettier-ignore
   result.set(
-    cos(theta), -sin(theta), 0, tx,
-    sin(theta), cos(theta), 0, ty,
+    scale*cos(theta), -scale*sin(theta), 0, tx,
+    scale*sin(theta), scale*cos(theta), 0, ty,
     0, 0, 1, 0,
     0, 0, 0, 1,
-  )
+  ) // Scale and rotation matrices are multiplied but the transition part left intact.
+
   return result
 }
 
 function animation(time: number) {
+  if (!isRenderingNeeded) {
+    return
+  }
   if (params.useMatrix) {
     mesh.matrixAutoUpdate = false
     mesh.matrix = getTransformationMatrix()
@@ -61,8 +67,8 @@ function animation(time: number) {
     mesh.scale.x = params.scale
     mesh.scale.y = params.scale
   }
-
   renderer.render(scene, camera)
+  isRenderingNeeded = false
 }
 
 function getBox() {
@@ -109,6 +115,9 @@ function initParams() {
   pane.addInput(params, 'scale', {
     min: 0.1,
     max: 4,
+  })
+  pane.on('change', () => {
+    isRenderingNeeded = true
   })
   return params
 }
